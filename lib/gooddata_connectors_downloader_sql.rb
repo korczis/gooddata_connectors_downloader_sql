@@ -1,5 +1,7 @@
 require 'gooddata'
 require 'gooddata_connectors_base'
+require 'sequel'
+
 
 require 'gooddata_connectors_downloader_sql/version'
 require 'gooddata_connectors_downloader_sql/sql'

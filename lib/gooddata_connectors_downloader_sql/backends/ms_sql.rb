@@ -10,7 +10,6 @@ module GoodData
 
           def create_connection
             @db = Sequel.connect("jdbc:sqlserver://#{@connection_options['server']};database=#{@connection_options['database']}", :user=> @connection_options['username'], :password=> @connection_options['password'])
-            @db.extension(:sequel_3_dataset_methods)
           end
 
           def load_db_fields(entity_name)

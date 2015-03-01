@@ -26,19 +26,16 @@ module GoodData
           end
         end
 
-        # TODO: Implement
+
         def connect
           puts 'Connecting to storage with input CSVs'
           # database_type = @metadata.get_configuration_by_type_and_key(@type, 'type')
           database_type = @metadata.get_configuration_by_type_and_key(@type, 'type')
           options = @metadata.get_configuration_by_type_and_key(@type, 'options')
-
           @backend = Sql.create_backend(database_type,options["connection"])
         end
 
 
-
-        # TODO: Implement
         def load_metadata(entity_name)
           metadata_entity = @metadata.get_entity(entity_name)
           temporary_fields = @backend.load_db_fields(entity_name)
@@ -65,7 +62,7 @@ module GoodData
           diff["changed"].each do |change|
             source_field = change["source_field"]
             $log.info "The field #{source_field.name} in entity #{metadata_entity.id} has changed"
-            source_field.name = change["target_field"].name if change.include?("name")
+            #source_field.name = change["target_field"].name if change.include?("name")
             raise Exception,"The type in data structure file for field #{source_field.name} for entity #{metadata_entity.id} has changed. This is not supported in current version of SQL connector" if change.include?("type")
             metadata_entity.make_dirty()
           end
@@ -75,24 +72,25 @@ module GoodData
             metadata_entity.make_dirty()
           end
 
+          if !metadata_entity.custom.include?("enclosed_by") or metadata_entity.custom["enclosed_by"] != '"'
+            metadata_entity.custom["enclosed_by"] = '"'
+            metadata_entity.make_dirty()
+          end
           metadata.save_entity(metadata_entity)
         end
 
         # TODO: Implement
         def download_entity_data(entity_name)
           metadata_entity = @metadata.get_entity(entity_name)
-          @backend.download_entity(entity_name,metadata_entity.get_enabled_fields)
-
-
+          file = @backend.download_data(entity_name,metadata_entity.get_enabled_fields)
+          metadata_entity.store_runtime_param("source_filename",file)
+          response = @metadata.save_data(metadata_entity)
         end
 
         # TODO: Implement
         def define_default_entities
           []
         end
-
-
-
 
         private
 

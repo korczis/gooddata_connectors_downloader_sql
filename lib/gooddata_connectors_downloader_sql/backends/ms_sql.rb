@@ -36,6 +36,8 @@ module GoodData
                 #Numeric - Decimal
                 when 55,63,122,60
                   type = "decimal-#{column[:prec] + column[:scale]}-#{column[:scale]}"
+                when 104
+                  type = "boolean"
                 else
                   $log.info "Unsupported database type #{column[:name]} - using string(255) as default value"
                   type = "string-255"
